@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Based Learning App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .element {
+            background-color: #f8f9fa;
+            background-image: url('image.PNG');
+            background-size: cover;
+        }
+
+
+        .container {
+                background-color: #cfcfcfed;
+                max-width: 600px;
+                margin-top: 50px;
+                padding: 3rem;
+                /* border: 2px solid blue !important; */
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        #timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: red;
+        }
+        .me-md-2 {
+        margin-left: 8.5rem !important;
+        margin-right: 0px !important;
+    }
+    </style>
+</head>
+
+<body class="element">
+    <div class="container">
+        <h2 class="text-center">AI-Based Personalized Learning</h2><hr>
+        <div id="login-container">
+            <input type="text" id="username" class="form-control" placeholder="Enter your name" />
+            <select id="class-selection" class="form-select mt-3">
+                <option value="" disabled selected>Select your class</option>
+                <option value="class1">Class 1</option>
+                <option value="class2">Class 2</option>
+                <option value="class3">Class 3</option>
+            </select>
+            <button class="btn btn-primary mt-3" onclick="startQuiz()">Start Quiz</button>
+            <button class="btn btn-warning mt-3 me-md-2" onclick="viewAllUsers()">Already given Exam Users' Marks</button>
+        </div>
+
+        <!-- Button to view all users -->
+        <div id="view-all-users-container" class="mt-3">
+            
+        </div>
+
+        <div id="quiz-container" class="hidden">
+            <p id="timer" class="text-danger">Time Left: 5:00</p>
+            <p id="question"></p>
+            <div id="options" class="list-group"></div>
+            <button class="btn btn-primary mt-3" onclick="nextQuestion()">Next</button>
+        </div>
+
+        <div id="result-container" class="hidden">
+            <h3>Your Total Marks: <span id="total-marks"></span></h3>
+            <h3>Your Weak Areas</h3>
+            <ul id="weakness-list" class="list-group"></ul>
+            <h4 class="mt-3">Recommended Lessons</h4>
+            <ul id="lesson-list" class="list-group"></ul>
+            <div id="no-weakness-message" class="alert alert-success hidden" role="alert">
+                You have no weakness! Great job!
+            </div>
+            <button class="btn btn-success mt-3" onclick="restartQuiz()">Restart Quiz</button>
+        </div>
+
+        <!-- Table to show all users' marks -->
+        <div id="all-users-container" class="hidden mt-3">
+            <h3>Already given exam Student List:</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr style="text-align: center;">
+                        <th scope="col">Student Name</th>
+                        <th scope="col">Marks</th>
+                    </tr>
+                </thead>
+                <tbody id="users-list">
+                    <!-- User list will be populated here -->
+                </tbody>
+            </table>
+            <button class="btn btn-primary mt-3" onclick="hideUserList()">Hide List</button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = "";
+        let selectedClass = "";
+        let timer;
+        let timeLeft = 300; // 1 minute in seconds
+
+        const classQuestions = {
+            class1: [
+                { q: "What is 1 + 1?", options: ["1", "2", "3", "4"], answer: "2", topic: "Basic Addition" },
+                { q: "What is the color of the sky?", options: ["Blue", "Red", "Green", "Yellow"], answer: "Blue", topic: "Basic Knowledge" },
+                { "q": "What is the color of the sky?", "options": ["Blue", "Red", "Green", "Yellow"], "answer": "Blue", "topic": "Basic Knowledge" },
+                { "q": "What is 2 + 2?", "options": ["3", "4", "5", "6"], "answer": "4", "topic": "Mathematics" },
+                { "q": "What is the capital of France?", "options": ["London", "Paris", "Rome", "Berlin"], "answer": "Paris", "topic": "Geography" },
+                { "q": "What is the largest mammal?", "options": ["Elephant", "Blue Whale", "Giraffe", "Lion"], "answer": "Blue Whale", "topic": "Science" },
+                { "q": "Which planet is closest to the sun?", "options": ["Earth", "Venus", "Mercury", "Mars"], "answer": "Mercury", "topic": "Astronomy" },
+                { "q": "Who wrote 'Hamlet'?", "options": ["Shakespeare", "Dickens", "Hemingway", "Tolkien"], "answer": "Shakespeare", "topic": "Literature" },
+                { "q": "What is the boiling point of water?", "options": ["90°C", "100°C", "110°C", "120°C"], "answer": "100°C", "topic": "Science" },
+                { "q": "Which animal is known as the King of the Jungle?", "options": ["Lion", "Tiger", "Elephant", "Giraffe"], "answer": "Lion", "topic": "Animals" },
+                
+            ],
+            class2: [
+                { q: "What is 5 + 3?", options: ["6", "7", "8", "9"], answer: "8", topic: "Basic Addition" },
+                { q: "What is the capital of France?", options: ["Berlin", "Madrid", "Paris", "Rome"], answer: "Paris", topic: "Geography" },
+                { "q": "What is the largest ocean on Earth?", "options": ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"], "answer": "Pacific Ocean", "topic": "Geography" },
+                { "q": "Which element has the chemical symbol O?", "options": ["Oxygen", "Osmium", "Ozone", "Opium"], "answer": "Oxygen", "topic": "Science" },
+                { "q": "What is the national currency of Japan?", "options": ["Yuan", "Won", "Yen", "Ringgit"], "answer": "Yen", "topic": "General Knowledge" },
+                { "q": "What is the tallest mountain in the world?", "options": ["Mount Everest", "K2", "Kangchenjunga", "Makalu"], "answer": "Mount Everest", "topic": "Geography" },
+                { "q": "Who painted the Mona Lisa?", "options": ["Van Gogh", "Da Vinci", "Picasso", "Michelangelo"], "answer": "Da Vinci", "topic": "Art" },
+                { "q": "What is the largest continent?", "options": ["Africa", "Asia", "Europe", "North America"], "answer": "Asia", "topic": "Geography" },
+                { "q": "What is the chemical symbol for water?", "options": ["H2O", "CO2", "O2", "H2O2"], "answer": "H2O", "topic": "Science" },
+                { "q": "Which country is known as the Land of the Rising Sun?", "options": ["South Korea", "China", "Japan", "Thailand"], "answer": "Japan", "topic": "Geography" },
+            ],
+            class3: [
+                { q: "What is the square root of 16?", options: ["3", "4", "5", "6"], answer: "4", topic: "Algebra" },
+                { q: "What is the chemical symbol for water?", options: ["H2O", "CO2", "O2", "N2"], answer: "H2O", topic: "Chemistry" },
+                { "q": "Who discovered gravity?", "options": ["Einstein", "Newton", "Galileo", "Tesla"], "answer": "Newton", "topic": "Science" },
+                { "q": "What is the main ingredient in guacamole?", "options": ["Tomato", "Avocado", "Lime", "Onion"], "answer": "Avocado", "topic": "Food" },
+                { "q": "What is the speed of light?", "options": ["300,000 km/s", "150,000 km/s", "1,000,000 km/s", "500,000 km/s"], "answer": "300,000 km/s", "topic": "Science" },
+                { "q": "What is the main source of energy for the Earth?", "options": ["The Moon", "The Sun", "The Wind", "Volcanoes"], "answer": "The Sun", "topic": "Science" },
+                { "q": "Who was the first President of the United States?", "options": ["Abraham Lincoln", "Thomas Jefferson", "George Washington", "John Adams"], "answer": "George Washington", "topic": "History" },
+                { "q": "Which animal is known for having black and white stripes?", "options": ["Tiger", "Zebra", "Panda", "Skunk"], "answer": "Zebra", "topic": "Animals" },
+                { "q": "What is the capital of Japan?", "options": ["Beijing", "Seoul", "Tokyo", "Bangkok"], "answer": "Tokyo", "topic": "Geography" },
+                { "q": "What is the smallest prime number?", "options": ["1", "2", "3", "5"], "answer": "2", "topic": "Mathematics" }
+            ]
+        };
+
+        let currentQuestionIndex = 0;
+        let wrongAnswers = [];
+        let totalMarks = 0;
+
+        function startQuiz() {
+            currentUser = document.getElementById("username").value.trim();
+            selectedClass = document.getElementById("class-selection").value;
+
+            if (currentUser === "" || !selectedClass) {
+                alert("Please enter your name and select a class.");
+                return;
+            }
+
+            // Check if the user has already taken the quiz
+            let quizData = JSON.parse(localStorage.getItem("quizData")) || {};
+            if (quizData[currentUser]) {
+                alert("You have already taken the exam. You cannot retake it.");
+                return;
+            }
+
+            document.getElementById("login-container").classList.add("hidden");
+            document.getElementById("quiz-container").classList.remove("hidden");
+            loadQuestion();
+            startTimer();
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    cancelQuiz();
+                } else {
+                    let minutes = Math.floor(timeLeft / 60);
+                    let seconds = timeLeft % 60;
+                    document.getElementById("timer").textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    timeLeft--;
+                }
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            const questionObj = classQuestions[selectedClass][currentQuestionIndex];
+            document.getElementById("question").textContent = questionObj.q;
+            const optionsContainer = document.getElementById("options");
+            optionsContainer.innerHTML = "";
+
+            questionObj.options.forEach(option => {
+                const btn = document.createElement("button");
+                btn.classList.add("list-group-item", "list-group-item-action");
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option, questionObj.answer, questionObj.topic);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct, topic) {
+            if (selected !== correct) {
+                wrongAnswers.push(topic);
+            } else {
+                totalMarks++;
+            }
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < classQuestions[selectedClass].length) {
+                loadQuestion();
+            } else {
+                clearInterval(timer);
+                saveResults();
+                showResults();
+            }
+        }
+
+        function saveResults() {
+            let userData = JSON.parse(localStorage.getItem("quizData")) || {};
+            userData[currentUser] = { weakAreas: wrongAnswers, marks: totalMarks };
+            localStorage.setItem("quizData", JSON.stringify(userData));
+        }
+
+        function showResults() {
+            document.getElementById("quiz-container").classList.add("hidden");
+            document.getElementById("result-container").classList.remove("hidden");
+
+            document.getElementById("total-marks").textContent = totalMarks;
+            let weaknesses = [...new Set(wrongAnswers)];
+
+            if (weaknesses.length === 0) {
+                document.getElementById("no-weakness-message").classList.remove("hidden");
+                document.getElementById("weakness-list").classList.add("hidden");
+                document.getElementById("lesson-list").classList.add("hidden");
+            } else {
+                document.getElementById("weakness-list").innerHTML = weaknesses.map(topic => `<li class='list-group-item'>${topic}</li>`).join('');
+                document.getElementById("lesson-list").innerHTML = weaknesses.map(topic => `<li class='list-group-item'>Study more on ${topic}</li>`).join('');
+                document.getElementById("no-weakness-message").classList.add("hidden");
+            }
+        }
+
+        function cancelQuiz() {
+            alert("Time is up! The quiz has been canceled.");
+            restartQuiz();
+        }
+
+        function restartQuiz() {
+            clearInterval(timer);
+            timeLeft = 60; // Reset timer
+            currentQuestionIndex = 0;
+            wrongAnswers = [];
+            totalMarks = 0;
+            document.getElementById("quiz-container").classList.add("hidden");
+            document.getElementById("result-container").classList.add("hidden");
+            document.getElementById("login-container").classList.remove("hidden");
+            document.getElementById("username").value = "";
+            document.getElementById("class-selection").value = "";
+        }
+
+        function viewAllUsers() {
+            let quizData = JSON.parse(localStorage.getItem("quizData")) || {};
+            let usersListContainer = document.getElementById("users-list");
+            usersListContainer.innerHTML = "";
+
+            for (let username in quizData) {
+                let row = document.createElement("tr");
+                row.innerHTML = `<td>${username}</td><td style="text-align:center";>${quizData[username].marks}</td>`;
+                usersListContainer.appendChild(row);
+            }
+
+            document.getElementById("all-users-container").classList.remove("hidden");
+        }
+
+        function hideUserList() {
+            document.getElementById("all-users-container").classList.add("hidden");
+        }
+    </script>
+</body>
+
+</html>

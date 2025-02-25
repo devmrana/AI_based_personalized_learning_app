@@ -1,0 +1,29 @@
+.element {
+    background-color: #f8f9fa;
+    background-image: url('image.PNG');
+    background-size: cover;
+}
+
+
+.container {
+    background-color: #cfcfcfed;
+    max-width: 600px;
+    margin-top: 50px;
+    padding: 3rem;
+    /* border: 2px solid blue !important; */
+}
+
+.hidden {
+    display: none;
+}
+
+#timer {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: red;
+}
+
+.me-md-2 {
+    margin-left: 8.5rem !important;
+    margin-right: 0px !important;
+}
