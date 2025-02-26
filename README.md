@@ -1,4 +1,4 @@
-# AI_based_personalized_learning_app
+# AI_based_personalized_learning_app:
 এই অ্যাপটি শিক্ষার্থীদের দুর্বলতা শনাক্ত করতে এবং কাস্টমাইজড পাঠ পরিকল্পনা তৈরি করতে ডিজাইন করা হয়েছে। এটি HTML, CSS, এবং JavaScript ব্যবহার করে তৈরি করা হয়েছে, যেখানে Local Storage ব্যবহার করে ডেটা সংরক্ষণ করা হয়।
 
 মূল বৈশিষ্ট্যসমূহ:
