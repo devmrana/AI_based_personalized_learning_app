@@ -31,26 +31,30 @@
             font-weight: bold;
             color: red;
         }
-        .me-md-2 {
+        /* .me-md-2 {
         margin-left: 8.5rem !important;
         margin-right: 0px !important;
-    }
+    } */
     </style>
 </head>
 
 <body class="element">
     <div class="container">
-        <h2 class="text-center">AI-Based Personalized Learning</h2><hr>
+        <h2 class="text-center">AI-Based Personalized Learning</h2>
+        <button class="btn btn-warning mt-3 me-md-2" onclick="viewAllUsers()">Already given Exam Users' Marks</button>
+        <hr>
         <div id="login-container">
             <input type="text" id="username" class="form-control" placeholder="Enter your name" />
             <select id="class-selection" class="form-select mt-3">
                 <option value="" disabled selected>Select your class</option>
-                <option value="class1">Class 1</option>
-                <option value="class2">Class 2</option>
-                <option value="class3">Class 3</option>
+                <option value="Class6">Class 6</option>
+                <option value="Class7">Class 7</option>
+                <option value="Class8">Class 8</option>
+                <option value="Class9">Class 9</option>
+                <option value="Class10">Class 10</option>
             </select>
             <button class="btn btn-primary mt-3" onclick="startQuiz()">Start Quiz</button>
-            <button class="btn btn-warning mt-3 me-md-2" onclick="viewAllUsers()">Already given Exam Users' Marks</button>
+            
         </div>
 
         <!-- Button to view all users -->
@@ -62,7 +66,8 @@
             <p id="timer" class="text-danger">Time Left: 5:00</p>
             <p id="question"></p>
             <div id="options" class="list-group"></div>
-            <button class="btn btn-primary mt-3" onclick="nextQuestion()">Next</button>
+            <button id="next-btn" class="btn btn-primary mt-3" onclick="nextQuestion()" disabled>Next</button>
+
         </div>
 
         <div id="result-container" class="hidden">
@@ -102,42 +107,44 @@
         let timeLeft = 300; // 1 minute in seconds
 
         const classQuestions = {
-            class1: [
-                { q: "What is 1 + 1?", options: ["1", "2", "3", "4"], answer: "2", topic: "Basic Addition" },
-                { q: "What is the color of the sky?", options: ["Blue", "Red", "Green", "Yellow"], answer: "Blue", topic: "Basic Knowledge" },
-                { "q": "What is the color of the sky?", "options": ["Blue", "Red", "Green", "Yellow"], "answer": "Blue", "topic": "Basic Knowledge" },
-                { "q": "What is 2 + 2?", "options": ["3", "4", "5", "6"], "answer": "4", "topic": "Mathematics" },
-                { "q": "What is the capital of France?", "options": ["London", "Paris", "Rome", "Berlin"], "answer": "Paris", "topic": "Geography" },
-                { "q": "What is the largest mammal?", "options": ["Elephant", "Blue Whale", "Giraffe", "Lion"], "answer": "Blue Whale", "topic": "Science" },
-                { "q": "Which planet is closest to the sun?", "options": ["Earth", "Venus", "Mercury", "Mars"], "answer": "Mercury", "topic": "Astronomy" },
-                { "q": "Who wrote 'Hamlet'?", "options": ["Shakespeare", "Dickens", "Hemingway", "Tolkien"], "answer": "Shakespeare", "topic": "Literature" },
-                { "q": "What is the boiling point of water?", "options": ["90°C", "100°C", "110°C", "120°C"], "answer": "100°C", "topic": "Science" },
-                { "q": "Which animal is known as the King of the Jungle?", "options": ["Lion", "Tiger", "Elephant", "Giraffe"], "answer": "Lion", "topic": "Animals" },
+            Class6: [
+                { q: "কোনটি নবীকরণযোগ্য শক্তির উৎস?", options: ["a) পেট্রোল", "b) কয়লা", "c) সৌরশক্তি", "d) প্রাকৃতিক গ্যাস"], answer: "সৌরশক্তি", topic: "Science" },
+                { q: "Apple এর বাংলা কী?", options: ["a) কমলা", "b) আপেল", "c) পেয়ারা", "d) কলা"], answer: "আপেল", topic: "English" },
+                { q: "বাংলাদেশের জাতীয় ফুল কী?", options: ["a) গোলাপ", "b) শাপলা", "c) সুনদরি", "d) পদ্ম"], answer: "শাপলা", topic: "General Knowledge" },
+                { q: "কম্পিউটারের ব্রাউজার কী কাজে ব্যবহৃত হয়?", options: ["a) ভিডিও দেখা", "b) ইন্টারনেট ব্রাউজ করা", "c) গান শোনা", "d) গেম খেলা"], answer: "ইন্টারনেট ব্রাউজ করা", topic: "ICT" },
+                { q: "গণিতের জনক কে?", options: ["a) আল খাওয়ারিজমি", "b) পিথাগোরাস", "c) নিউটন", "d) গ্যালিলিও"], answer: "পিথাগোরাস", topic: "Mathematics" }
                 
             ],
-            class2: [
-                { q: "What is 5 + 3?", options: ["6", "7", "8", "9"], answer: "8", topic: "Basic Addition" },
-                { q: "What is the capital of France?", options: ["Berlin", "Madrid", "Paris", "Rome"], answer: "Paris", topic: "Geography" },
-                { "q": "What is the largest ocean on Earth?", "options": ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"], "answer": "Pacific Ocean", "topic": "Geography" },
-                { "q": "Which element has the chemical symbol O?", "options": ["Oxygen", "Osmium", "Ozone", "Opium"], "answer": "Oxygen", "topic": "Science" },
-                { "q": "What is the national currency of Japan?", "options": ["Yuan", "Won", "Yen", "Ringgit"], "answer": "Yen", "topic": "General Knowledge" },
-                { "q": "What is the tallest mountain in the world?", "options": ["Mount Everest", "K2", "Kangchenjunga", "Makalu"], "answer": "Mount Everest", "topic": "Geography" },
-                { "q": "Who painted the Mona Lisa?", "options": ["Van Gogh", "Da Vinci", "Picasso", "Michelangelo"], "answer": "Da Vinci", "topic": "Art" },
-                { "q": "What is the largest continent?", "options": ["Africa", "Asia", "Europe", "North America"], "answer": "Asia", "topic": "Geography" },
-                { "q": "What is the chemical symbol for water?", "options": ["H2O", "CO2", "O2", "H2O2"], "answer": "H2O", "topic": "Science" },
-                { "q": "Which country is known as the Land of the Rising Sun?", "options": ["South Korea", "China", "Japan", "Thailand"], "answer": "Japan", "topic": "Geography" },
+            Class7: [
+                { q: "Which one is a verb?", options: ["a) Run", "b) Big", "c) Happy", "d) Blue"], answer: "Run", topic: "English" },
+                { q: "π (Pi) এর মান কত?", options: ["a) 2.14", "b) 3.14", "c) 1.41", "d) 4.13"], answer: "3.14", topic: "Mathematics" },
+                { q: "বাংলাদেশের স্বাধীনতার বছর কোনটি?", options: ["a) 1952", "b) 1971", "c) 1965", "d) 1990"], answer: "1971", topic: "General Knowledge" },
+                { q: "কম্পিউটারের প্রধান মেমোরি কোনটি?", options: ["a) RAM", "b) ROM", "c) Hard Disk", "d) Pen Drive"], answer: "RAM", topic: "ICT" },
+                { q: "মানুষের শরীরের বৃহত্তম অঙ্গ কোনটি?", options: ["a) লিভার", "b) স্কিন", "c) হার্ট", "d) ব্রেইন"], answer: "স্কিন", topic: "Science" }
+
             ],
-            class3: [
-                { q: "What is the square root of 16?", options: ["3", "4", "5", "6"], answer: "4", topic: "Algebra" },
-                { q: "What is the chemical symbol for water?", options: ["H2O", "CO2", "O2", "N2"], answer: "H2O", topic: "Chemistry" },
-                { "q": "Who discovered gravity?", "options": ["Einstein", "Newton", "Galileo", "Tesla"], "answer": "Newton", "topic": "Science" },
-                { "q": "What is the main ingredient in guacamole?", "options": ["Tomato", "Avocado", "Lime", "Onion"], "answer": "Avocado", "topic": "Food" },
-                { "q": "What is the speed of light?", "options": ["300,000 km/s", "150,000 km/s", "1,000,000 km/s", "500,000 km/s"], "answer": "300,000 km/s", "topic": "Science" },
-                { "q": "What is the main source of energy for the Earth?", "options": ["The Moon", "The Sun", "The Wind", "Volcanoes"], "answer": "The Sun", "topic": "Science" },
-                { "q": "Who was the first President of the United States?", "options": ["Abraham Lincoln", "Thomas Jefferson", "George Washington", "John Adams"], "answer": "George Washington", "topic": "History" },
-                { "q": "Which animal is known for having black and white stripes?", "options": ["Tiger", "Zebra", "Panda", "Skunk"], "answer": "Zebra", "topic": "Animals" },
-                { "q": "What is the capital of Japan?", "options": ["Beijing", "Seoul", "Tokyo", "Bangkok"], "answer": "Tokyo", "topic": "Geography" },
-                { "q": "What is the smallest prime number?", "options": ["1", "2", "3", "5"], "answer": "2", "topic": "Mathematics" }
+            Class8: [
+                { q: "সর্ববৃহৎ মহাসাগরের নাম কী?", options: ["a) আটলান্টিক", "b) ভারত মহাসাগর", "c) প্রশান্ত মহাসাগর", "d) আর্কটিক"], answer: "প্রশান্ত মহাসাগর", topic: "General Knowledge" },
+                { q: "Which word is a pronoun?", options: ["a) Table", "b) They", "c) Jump", "d) Tall"], answer: "They", topic: "English" },
+                { q: "a=3, b=5 তাহলে ab=কত?", options: ["a) 8", "b) 15", "c) 2", "d) 0"], answer: "15", topic: "Mathematics" },
+                { q: "USB-এর পূর্ণরূপ কী?", options: ["a) Universal Service Bus", "b) Universal Serial Bus", "c) United System Board", "d) Universal Support Base"], answer: "Universal Serial Bus", topic: "ICT" },
+                { q: "পানির সংকেত কোনটি?", options: ["a) NaCl", "b) H2SO4", "c) H2O", "d) HCl"], answer: "H2O", topic: "Science" },
+
+
+            ],
+            Class9: [
+                { q: "What is the plural of 'Child'?", options: ["a) Childs", "b) Children", "c) Childes", "d) Childer"], answer: "Children", topic: "English" },
+                { q: "What is the full form of HTML?", options: ["a) HyperText Markup Language", "b) Hyperlink Markup Language", "c) HyperText Machine Language", "d) Hyperlink Text Management Language"], answer: "HyperText Markup Language", topic: "ICT" },
+                { q: "বৈদ্যুতিক বর্তনের একক কী?", options: ["a) ওহম", "b) ভোল্ট", "c) ওয়াট", "d) অ্যাম্পিয়ার"], answer: "অ্যাম্পিয়ার", topic: "Science" },
+                { q: "একটি বৃত্তের ব্যাসার্ধ ৭ সেমি হলে এর পরিধি কত?", options: ["a) 22 cm", "b) 44 cm", "c) 21 cm", "d) 42 cm"], answer: "44 cm", topic: "Mathematics" },
+                { q: "কোন দেশটি সূর্যোদয়ের দেশ হিসেবে পরিচিত?", options: ["a) চীন", "b) জাপান", "c) দক্ষিণ কোরিয়া", "d) ভারত"], answer: "জাপান", topic: "General Knowledge" }
+            ],
+            Class10: [
+                { q: "ই-মেইল পাঠানোর জন্য কোন প্রোটোকল ব্যবহৃত হয়?", options: ["a) HTTP", "b) SMTP", "c) FTP", "d) POP3"], answer: "SMTP", topic: "ICT" },
+                { q: "If x = 3 and y = 4, what is x² + y²?", options: ["a) 12", "b) 16", "c) 25", "d) 10"], answer: "25", topic: "Mathematics" },
+                { q: "বাংলাদেশের জাতীয় পতাকার ডিজাইনার কে?", options: ["a) গাজীউল হক", "b) কামরুল হাসান", "c) মোহাম্মদ হানিফ", "d) সৈয়দ নাজরুল ইসলাম"], answer: "কামরুল হাসান", topic: "General Knowledge" },
+                { q: "What is the opposite of 'Soft'?", options: ["a) Hard", "b) Smooth", "c) Light", "d) Weak"], answer: "Hard", topic: "English" },
+                { q: "সূর্যের সবচেয়ে প্রচুর গ্যাস কোনটি?", options: ["a) নাইট্রোজেন", "b) অক্সিজেন", "c) হাইড্রোজেন", "d) কার্বন"], answer: "হাইড্রোজেন", topic: "Science" }
             ]
         };
 
@@ -182,39 +189,56 @@
         }
 
         function loadQuestion() {
-            const questionObj = classQuestions[selectedClass][currentQuestionIndex];
-            document.getElementById("question").textContent = questionObj.q;
-            const optionsContainer = document.getElementById("options");
-            optionsContainer.innerHTML = "";
+                const questionObj = classQuestions[selectedClass][currentQuestionIndex];
+                document.getElementById("question").textContent = questionObj.q;
+                const optionsContainer = document.getElementById("options");
+                optionsContainer.innerHTML = "";
 
-            questionObj.options.forEach(option => {
-                const btn = document.createElement("button");
-                btn.classList.add("list-group-item", "list-group-item-action");
-                btn.textContent = option;
-                btn.onclick = () => checkAnswer(option, questionObj.answer, questionObj.topic);
-                optionsContainer.appendChild(btn);
-            });
-        }
+                // Disable Next button initially
+                const nextBtn = document.getElementById("next-btn");
+                nextBtn.disabled = true;
+                nextBtn.dataset.selected = ""; // Reset selected answer
 
-        function checkAnswer(selected, correct, topic) {
-            if (selected !== correct) {
-                wrongAnswers.push(topic);
-            } else {
-                totalMarks++;
+                questionObj.options.forEach(option => {
+                    const btn = document.createElement("button");
+                    btn.classList.add("list-group-item", "list-group-item-action");
+                    btn.textContent = option;
+                    btn.onclick = function () {
+                        document.querySelectorAll("#options .list-group-item").forEach(b => b.classList.remove("active"));
+                        btn.classList.add("active"); // Highlight selected answer
+                        nextBtn.dataset.selected = option; // Store selected answer
+                        nextBtn.disabled = false; // Enable Next button
+                    };
+                    optionsContainer.appendChild(btn);
+                });
             }
-            nextQuestion();
-        }
 
-        function nextQuestion() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < classQuestions[selectedClass].length) {
-                loadQuestion();
-            } else {
-                clearInterval(timer);
-                saveResults();
-                showResults();
+            function nextQuestion() {
+                const nextBtn = document.getElementById("next-btn");
+                const selected = nextBtn.dataset.selected;
+
+                if (!selected) {
+                    alert("Please select an answer before proceeding.");
+                    return;
+                }
+
+                const questionObj = classQuestions[selectedClass][currentQuestionIndex];
+                if (selected !== questionObj.answer) {
+                    wrongAnswers.push(questionObj.topic);
+                } else {
+                    totalMarks++;
+                }
+
+                currentQuestionIndex++;
+                if (currentQuestionIndex < classQuestions[selectedClass].length) {
+                    loadQuestion();
+                } else {
+                    clearInterval(timer);
+                    saveResults();
+                    showResults();
+                }
             }
-        }
+
 
         function saveResults() {
             let userData = JSON.parse(localStorage.getItem("quizData")) || {};
